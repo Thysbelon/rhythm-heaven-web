@@ -1,0 +1,250 @@
+:root {
+	--scaly: 1.5;
+	--playState: paused;
+	--rhythm: 0.5s;
+}
+body {background-color: black; margin: 0px; padding: 0px; border: 0; overflow:hidden; width:100vw; height:100vh; cursor: none;}
+#container {
+	width:100%;
+	height:100%;
+	display: flex; align-items: center; justify-content: center;position: static;
+}
+#gamearea {
+	width: 854px;
+	height: 480px;
+	transform:scale(var(--scaly));
+	background-color: blue;
+	clip-path: inset(100%);
+	opacity: 0;
+	animation-name: fadein;
+	animation-duration: 0.5s;
+	animation-fill-mode: forwards;
+	animation-timing-function: linear;
+	animation-iteration-count: 1;
+}
+#zoomarea {
+	width: 100%;
+	height: 100%;
+	transform:scale(1.1);
+	transform-origin: 50% 50%
+	/*50 50 is centered*/
+}
+div {
+	background-repeat: no-repeat;
+	background-position: center;
+	position: absolute;
+	animation-play-state: var(--playState);
+	animation-duration: var(--rhythm);
+	animation-timing-function: step-end;
+	animation-iteration-count: infinite;
+}
+#gbg, #gbg div {
+	z-index: -1;
+}
+#gbg {
+	background-image: url('2ndwidestbg.png');	
+	width: 854px;
+	height: 480px;
+}
+#island {
+	background-image: url('island sprite sheet.png');
+	background-position: -2px -2px;
+	width: 189px;
+	height: 191px;
+	right:260px;
+	top:150px;
+	animation-duration: 3s;
+}
+#golfer, #gshadow {
+	background-image: url('golfspritesheet.png');
+	width: 335px;
+	height: 378px;
+}
+#golfer {
+	background-position: -3382px -2px;
+	animation-name: none;
+	right: 60px;
+	bottom: 15px;
+}
+#gshadow {
+	background-position: -1016px -1145px;
+}
+#monkey, #monkey div {
+	background-image: url('monkey spritesheet.png');
+	width: 156px;
+	height: 207px;
+}
+
+#monkey {
+	
+	background-position: -320px -422px;
+	left:330px;
+	bottom: 55px;
+	/*animation-name: monkeybopbody;*/
+	animation-name: none;
+}
+
+#mheadcontainer {
+	/*for some reason, mheadcontainer's starting position is a few pixels left compared to it's position in monkeybophead. this is troublesome, because it causes a noticeable jitter everytime the bop animation is reset for a bpmchange*/
+	/*noticeable jitter no longer happens thanks to cloning animations*/
+	/*this bg position makes it invisible*/
+	background-position: -638px -422px;
+	/*animation-name: monkeybophead; */
+	animation-name: none;
+}
+#mhead {
+	background-position: -956px -632px;
+	animation-name: none;
+	animation-duration: 1s;
+	animation-iteration-count: 1;
+}
+#mshadow {
+	background-position: -479px -422px;
+}
+#mandrill, #m2shadow {
+	background-image: url('mandril spritesheet.png');
+	width: 483px;
+	height: 406px;
+}
+#mandrill {
+	background-position: -974px -2px;
+	left: -45px;
+	bottom: 22px;
+}
+#m2shadow {
+	background-position: -2918px -2px;
+}
+#beatracker {
+	animation-name: none;
+}
+
+/*animations*/	
+@keyframes fadein {
+	from {opacity: 0}
+	to {opacity: 1}
+}
+@keyframes monkeybopbody_1 {
+	0%	{background-position: -2px -422px;}
+	20% {background-position: -161px -422px;}
+	40% {background-position: -320px -422px;}
+}
+@keyframes monkeybophead_1 {
+	0%	{transform: translate(0, 2px);}
+	20% {transform: translate(0, 1px);}
+	40% {transform: translate(0, 0px);}
+}
+@keyframes monkeyturnhead_1 {
+	0%	{background-position: -2px -632px;}
+	20%	{background-position: -161px -632px;}
+	30%	{background-position: -320px -632px;}
+	40%	{background-position: -479px -632px;}
+	70%	{background-position: -161px -632px;}
+	80%	{background-position: -638px -632px;}
+}
+@keyframes monkeypickup {
+	0%	{background-position: -2px -212px;}
+	20%	{background-position: -161px -212px;}
+}
+@keyframes monkeythrow {
+	0%	{background-position: -320px -212px;}
+	10%	{background-position: -479px -212px;}
+	/*40% {background-position: -320px -422px;}*/
+	40%	{background-position: -638px -212px;}
+	/*50%	{background-position: -797px -212px;}*/
+	/*can this be tweaked further?*/
+	/*Change this so mhead becomes visible again as soon as the throw is done, and you have more time to see the monkey's happy face.*/
+}
+@keyframes mandrilbop_1 {
+	0%	{background-position: -2px -2px;}
+	20% {background-position: -488px -2px;}
+	40% {background-position: -974px -2px;}
+}
+@keyframes mandrilcheer_1 {
+	0%	{background-position: -1460px -2px;}
+	20% {background-position: -1946px -2px;}
+	40% {background-position: -2432px -2px;}
+}
+@keyframes mandrilpickup {
+	0%	{background-position: -2px -411px;}
+	20% {background-position: -488px -411px;}
+}
+@keyframes mandrilrise {
+	0%	{background-position: -974px -411px;}
+	20% {background-position: -1460px -411px;}
+	40% {background-position: -1946px -411px;}
+}
+@keyframes mandrildown {
+	0%	{background-position: -2px -820px;}
+	10% {background-position: -488px -820px;}
+	20% {background-position: -974px -820px;}
+	30% {background-position: -1460px -820px;}
+	40% {background-position: -1946px -820px;}
+	50% {background-position: -2432px -820px;}
+	60% {background-position: -2918px -820px;}
+}
+@keyframes mandrilthrow {
+	0%	{background-position: -2px -1229px;}
+	10% {background-position: -488px -1229px;}
+	20% {background-position: -974px -1229px;}
+	30% {background-position: -1460px -1229px;}
+	40% {background-position: -1946px -1229px;}
+	50% {background-position: -2432px -1229px;}
+	60% {background-position: -2918px -1229px;}
+}
+@keyframes golferbop_1 {
+	/*golfer moves down, left, then up in bop animation. why? is it part of the spritesheet?*/
+	0%	{background-position: -2706px -2px;}
+	20%	{background-position: -3044px -2px;}
+	40%	{background-position: -3382px -2px;}
+}
+@keyframes golfswing_1 {
+	0%	{background-position: -340px  -764px;} /*just or miss, this position is miss, 0*/
+	10%	{background-position: -678px  -764px;} /*1*/
+	20%	{background-position: -1016px -764px;} /*2*/
+	30%	{background-position: -1354px -764px;} /*3*/
+	30%	{background-position: -1354px -764px;} 
+	40%	{background-position: -1692px -764px;} /*4*/
+	40%	{background-position: -1692px -764px;}
+	50%	{background-position: -2030px -764px;} /*5*/
+	60%	{background-position: -2368px -764px;} /*6*/
+	70%	{background-position: -2706px -764px;} /*7*/
+}
+@keyframes golfready_1 {
+	0%		{background-position: -2px     -2px;}
+	8%		{background-position: -340px   -2px;}
+	16%		{background-position: -678px   -2px;}
+	24%		{background-position: -1016px  -2px;}
+	36%		{background-position: -1354px  -2px;}
+	48%		{background-position: -1692px  -2px;}
+	60%		{background-position: -2030px  -2px;}
+	72%		{background-position: -2368px  -2px;}
+}
+@keyframes golfnoinput {
+	0%		{background-position: -2px    -383px}
+    12.5%	{background-position: -340px  -383px}
+    25%		{background-position: -678px  -383px}
+    37.5%	{background-position: -1016px -383px}
+    50%		{background-position: -1354px -383px}
+    62.5%	{background-position: -1692px -383px}
+    75%		{background-position: -2030px -383px}
+    87.5%	{background-position: -2368px -383px}
+}
+@keyframes golferdead {
+	0%	{background-position: -2px -1145px}
+	5%	{background-position: -340px -1145px}
+	10%	{background-position: -678px -1145px}
+	15%	{background-position: -340px -1145px}
+	20%	{background-position: -678px -1145px}
+	25%	{background-position: -340px -1145px}
+	30%	{background-position: -678px -1145px}
+	35%	{background-position: -340px -1145px}
+	40%	{background-position: -678px -1145px}
+	45%	{background-position: -340px -1145px}
+	50%	{background-position: -678px -1145px}
+	55%	{background-position: -340px -1145px}
+	60%	{background-position: -678px -1145px}
+	65%	{background-position: -340px -1145px}
+	70%	{background-position: -678px -1145px}
+	75%	{background-position: -340px -1145px}
+	80%	{background-position: -678px -1145px}
+}
