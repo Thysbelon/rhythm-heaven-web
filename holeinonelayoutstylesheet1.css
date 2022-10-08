@@ -14,7 +14,7 @@ body {background-color: black; margin: 0px; padding: 0px; border: 0; overflow:hi
 	height: 480px;
 	transform:scale(var(--scaly));
 	background-color: blue;
-	clip-path: inset(100%);
+	/*clip-path: inset(100%); causes game to disappear on chrome only*/
 	opacity: 0;
 	animation-name: fadein;
 	animation-duration: 0.5s;
