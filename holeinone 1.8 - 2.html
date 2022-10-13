@@ -28,19 +28,30 @@ function gameplay() {
 	else {}*/
 	//todo: add page visibility api, add gamepad api, bluetooth api?, indexed db?
 	var r=document.querySelector(':root');
-	//The #gamearea is only 854 by 480 pixels, which is the resolution of the wii. This ResizeFunction runs every time the window is resized. The --scaly variable is used for transform:scale() on the #gamearea, to make it the size of the browser window.
+	/*The #gamearea is only 854 by 480 pixels, which is the resolution of the wii. This ResizeFunction runs every time the window is resized.
+	The --scaly variable is used for transform:scale() on the #gamearea, to make it the size of the browser window.*/
 	function ResizeFunction() {
 		r.style.setProperty('--scaly', (window.innerHeight/480));
 	}
 	//var PauseState=document.getElementById('pauseresumestate');
 	var CuePress=false;
 	var animtoggle=false; //have these toggles be dynamically generated for each rhythm game like m, mh, and mhc
-	var animtoggle2=false; //These animtoggles exist only to work around a limitation of CSS animations, the inability to reset a currently running animation and play it from the start. Animations that must be able to repeat, like the golf swing, have two identical copies that are switched between to create the illusion of repeating.
-	var boptoggle=1; //same as animtoggle. Usually the bop is an infinitely repeating animation, but it needs to be reset during bpm changes (for a clean look) and time signatures that are an odd number above 8 (because they only bop on quarter notes).
+	var animtoggle2=false; /*These animtoggles exist only to work around a limitation of CSS animations,
+	the inability to reset a currently running animation and play it from the start. 
+	Animations that must be able to repeat, like the golf swing, have two identical copies that are switched between to create the illusion of repeating.*/
+	var boptoggle=1; /*same as animtoggle. Usually the bop is an infinitely repeating animation, 
+	but it needs to be reset during bpm changes (for a clean look) and time signatures that are an odd number above 8 (because they only bop on quarter notes).*/
 	var AKeyPress=false; //detects if the key is being held; prevents the event from firing rapidly while the key is held.
 	var PauseKeyPress=false;
-	var btracker; //varible used to store invisible element #beatracker, this element's infinite bop animation has an iteration event listener attached that is used to properly restart an element's bop animation after a different animation has ended. for example, it is used to restart the bop on the Golfer after the player goofs around with the swing button outside of a cue.
-	var ResetGolferBop=function(){}; //these variables are called as functions by btracker on every beat. when a character's animation ends, their ResetBop variable is assigned a function that sets the character's animation back to the bop then assigns ResetBop back to an empty function. The fact that ResetBop's function is called by btracker's iteration bop, which is always on beat, ensures that the bop animation restarts on beat.
+	var btracker; /*varible used to store invisible element #beatracker, 
+	this element's infinite bop animation has 
+	an iteration event listener attached that is used to properly restart an element's bop animation 
+	after a different animation has ended. 
+	for example, it is used to restart the bop on the Golfer after the player goofs around with the swing button outside of a cue.*/
+	var ResetGolferBop=function(){}; /*these variables are called as functions by btracker on every beat. 
+	when a character's animation ends, their ResetBop variable is 
+	assigned a function that sets the character's animation back to the bop then assigns ResetBop back to an empty function. 
+	The fact that ResetBop's function is called by btracker's iteration bop, which is always on beat, ensures that the bop animation restarts on beat.*/
 	var ResetMonkeyBop=function(){};
 	var ResetMandrilBop=function(){};
 	var MandrilBopName='mandrilbop_'; //decides whether mandril is doing a bop or a cheer.
@@ -48,7 +59,10 @@ function gameplay() {
 	var safeZone=0.04;/*margin of error for player input. cue can be hit forty milliseconds before and after the cue
 	this should hopefully go out of scope when gameplay ends*/
 	const MySounds={bgm: null, pause: null}
-	const MyFunctions={ //Functions for every cue, such as the monkey picking up the ball, the monkey throwing the ball, a bpm change in the song, etc. These cues are scheduled in advance using the Web Audio API, after calculating times from the chart. when the time comes for the monkey to throw their ball at a certain part of the song, these are the functions that are being executed; they mostly handle syncing animations to the music and sound.
+	const MyFunctions={ /*Functions for every cue, such as the monkey picking up the ball, the monkey throwing the ball, a bpm change in the song, etc.
+		These cues are scheduled in advance using the Web Audio API, after calculating times from the chart. 
+		when the time comes for the monkey to throw their ball at a certain part of the song, these are the functions that are being executed; 
+		they mostly handle syncing animations to the music and sound.*/
 		/*the default animation name is now 'none', so every "style.animationName='none'" could be replaced with "style.animationName=''"*/
 		bgm: function(){
 			console.log('start bop');
@@ -63,7 +77,8 @@ function gameplay() {
 		bpmchange: function(){
 			curbpm++; //the chart's bpm changes are stored in the array bpmvalues. curbpm selects the index of that array.
 			console.log('bpmchange: '+bpmvalues[curbpm]);
-			r.style.setProperty('--rhythm', (60/bpmvalues[curbpm])+'s') //--rhythm controls the speed of all css animations. its main purpose is to keep the bop in sync with the song.
+			r.style.setProperty('--rhythm', (60/bpmvalues[curbpm])+'s') /*--rhythm controls the speed of all css animations. 
+			its main purpose is to keep the bop in sync with the song.*/
 			if (boptoggle===1) {boptoggle=2} else {boptoggle=1};
 			if (m.style.animationName.slice(0, -1)==='monkeybopbody_') {m.style.animationName='monkeybopbody_'+boptoggle};
 			if (dril.style.animationName.slice(0, -1)==='mandrilbop_') {dril.style.animationName='mandrilbop_'+boptoggle};
@@ -111,9 +126,12 @@ function gameplay() {
 		monkey2: function(){
 			ResetGolferBop=function(){}; //is this bad for perfomance? hopefully not.
 			//console.log('throw')
-			mhc.style.opacity=0; console.log("mhc.style.opacity=0"); //the monkey's head is separate from its body so the head's 'looking at the ball after a perfect hit' animation can play independently of the body's bop animation. when other animations, like throwing, are being performed, the bopping head is made invisible.
+			mhc.style.opacity=0; console.log("mhc.style.opacity=0"); /*the monkey's head is separate from its body so 
+			the head's 'looking at the ball after a perfect hit' animation can play independently of the body's bop animation. 
+			when other animations, like throwing, are being performed, the bopping head is made invisible.*/
 			setTimeout(function(){m.style.animationName='monkeythrow'; console.log("m.style.animationName='monkeythrow'")},2)
-			//the set timeout above is there to make sure that during a 1 1 1 cue ( https://youtu.be/_VIyF1e6sWk?t=79 ), the monkey will continously throw the ball, instead of continuously crouching down while the ball flies.
+			/*the set timeout above is there to make sure that during a 1 1 1 cue ( https://youtu.be/_VIyF1e6sWk?t=79 ), 
+			the monkey will continously throw the ball, instead of continuously crouching down while the ball flies.*/
 			//these two animations CANNOT use the same toggle boolean
 			//it will cause the standing glitch to happen again.
 			if (animtoggle2===true) {
@@ -124,7 +142,8 @@ function gameplay() {
 				animtoggle2=true
 			}
 		}, 
-		monkey3: function(time){ //when the player must hit the golf ball. time parameter is the time this function starts, 15 milliseconds before the perfect time to hit the golf ball.
+		monkey3: function(time){ /*when the player must hit the golf ball. 
+			time parameter is the time this function starts, 15 milliseconds before the perfect time to hit the golf ball.*/
 			//alt: complex monkey3function.js, timeout monkey3.js
 			timecompare=time+0.15
 			ResetGolferBop=function(){};
@@ -141,7 +160,8 @@ function gameplay() {
 			//mhc.style.animationName='none'
 			mhc.style.opacity=1; console.log("mhc.style.opacity=1")
 			ResetMonkeyBop=function(){if (m.style.animationName=='none') {m.style.animationName='monkeybopbody_'+boptoggle; console.log("m.style.animationName=monkeybopbody_"+boptoggle); mhc.style.animationName='monkeybophead_'+boptoggle;}; ResetMonkeyBop=function(){}}
-			//The if statement in ResetMonkeyBop fixes a glitch in which the pickup animation would be cancelled out by the standing animation, and monkey's head would still be at opacity 0
+			/*The if statement in ResetMonkeyBop fixes a glitch in which the pickup animation would be cancelled out by the standing animation, 
+			and monkey's head would still be at opacity 0*/
 			//console.log('start input')
 			var osci=ctx.createOscillator();
 			osci.start(time);
@@ -153,7 +173,7 @@ function gameplay() {
 						ResetGolferBop=function(){};
 						ResetGolferBop=function(){golfer.style.animationName='golferbop_'+boptoggle; console.log("golfer.style.animationName=golferbop_"+boptoggle); golfer.style.animationIterationCount='infinite'; ResetGolferBop=function(){}}
 					}, {once: true})
-					golferOsci.stop(timecompare+(45/bpmvalues[curbpm])); //ensures that the swing animation is not reset to bop too soon.
+					golferOsci.stop(timecompare+(45/bpmvalues[curbpm])); //ensures that the swing animation is not reset to the bop too soon.
 					switch (Math.floor(Math.random() * 3)) {
 						case 0:
 							playSound('golfNoPress1')
@@ -213,7 +233,8 @@ function gameplay() {
 	var menuctx=new AudioContext();
 	var pauseresumetoggle=pausethegame; //a variable storing a function
 	{
-		const TheChart={ /*now, the chart will go out of scope once the timers and counters have finished setting.*/ //The chart stores when each cue should play in the form of eigth beats.
+		const TheChart={ /*now, the chart will go out of scope once the timers and counters have finished setting.*/ 
+			//The chart stores when each cue should play in the form of eigth beats.
 			bpm:{ //stores bpm changes. beatnum is when the bpm change should happen. values are the bpm that the bpm should change to.
 			//beatnum:[1,9,17,25,33,41,49], //for tempotrack.mp3
 			//values:[169,310,169,310,133,310,133]
@@ -259,7 +280,8 @@ function gameplay() {
 		var curtimesig=0, timesigs=TheChart.timesig;
 		var curbeat=1; //used for the OddTimeSig function
 		if (TheChart.monkey!=null || TheChart.mandril!=null) {
-		//The idea behind this project was that the user would input their chart and music file, then the program would read the chart and ONLY run code and fetch assets needed for the rhythm games in that specific chart.
+		/*The idea behind this project was that the user would input their chart and music file, 
+		then the program would read the chart and ONLY run code and fetch assets needed for the rhythm games in that specific chart.*/
 			var m;
 			var mh;
 			var mhc;
@@ -273,7 +295,9 @@ function gameplay() {
 			var myCountdown=0; //keeps track of what workers have finished and when the song can start
 			
 			var MasterFetchWorker=new Worker('Fetcher.js'); //fetches the audio file of every sound effect in a separate thread.
-			var myCalculator=new Worker('SecondCalc2.js'); //takes the chart, then calculates from the eigth beats which time in seconds each of the cues should play. the result is stored in TimersArray
+			var myCalculator=new Worker('SecondCalc2.js'); /*takes the chart, 
+			then calculates from the eigth beats which time in seconds each of the cues should play. 
+			the result is stored in TimersArray*/
 			
 			var mymessage=['testsound.wav','testone2.mp3'/*song name here is placeholder, user should upload their chart and song file in an input file HTML tag*/];
 			if (c.sfx===true) {
@@ -281,7 +305,7 @@ function gameplay() {
 			}
 			if (c.monkey!=null) {
 				var monkeyindex=mymessage.length
-				//allows the program to correctly pick out the monkey sound effects from the array of all the sound effects that are received.
+				//monkeyindex allows the program to correctly pick out the monkey sound effects from the array of all the sound effects that are received.
 				mymessage.push('monky1.wav','monky2.wav','monky3.wav','NoPress1.wav','NoPress2.wav','NoPress3.wav','swingwhenidle.wav','miss.wav')
 				console.log('monkeyindex: '+monkeyindex)
 			}
@@ -354,7 +378,8 @@ function gameplay() {
 			document.body.append(cntnr);
 			cntnr.innerHTML="<div id=gamearea><div id=zoomarea><div id=beatracker></div><div id=golfer><div id=gshadow></div></div><div id=mandrill><div id=m2shadow></div></div><div id=monkey><div id=mheadcontainer><div id=mhead></div></div><div id=mshadow></div></div><div id=gbg><div id=island></div></div></div></div>"
 			var myLink=document.createElement('link');
-			myLink.addEventListener('load', function(){ //automatically duplicates animations that end with '_1' in the Stylesheet; to avoid redundancy in the stylesheet and still be able to repeat an animation by switching between identical copies of it.
+			myLink.addEventListener('load', function(){ /*automatically duplicates animations that end with '_1' in the Stylesheet; 
+			to avoid redundancy in the stylesheet and still be able to repeat an animation by switching between identical copies of it.*/
 				console.log('please')
 				let rules=myLink.sheet.cssRules
 				let thesheet=myLink.sheet
@@ -625,7 +650,9 @@ function gameplay() {
 		r.style.setProperty('--playState', 'running');
 	}
 	
-	function playCue(buffer, time) { //the Web Audio API can schedule sound effects in advance using an extremely accurate internal timer. unfortunately, the only way to use this timer to run functions rather than sound effects: is to make a silent oscillator and attach an event listener to that oscillator's 'ended' event.
+	function playCue(buffer, time) { /*the Web Audio API can schedule sound effects in advance using an extremely accurate internal timer. 
+	unfortunately, the only way to use this timer to run functions rather than sound effects: 
+	is to make a silent oscillator and attach an event listener to that oscillator's 'ended' event.*/
 		//would using a constant source node https://developer.mozilla.org/en-US/docs/Web/API/ConstantSourceNode
 		//be better than using an oscillator?
 		playSound(buffer, time);
