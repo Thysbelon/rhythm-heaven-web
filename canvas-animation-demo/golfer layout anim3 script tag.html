@@ -37,7 +37,7 @@ body {background-color: teal; margin: 0px; padding: 0px; border: 0; width:100vw;
 })()*/
 
 var golferImage=new Image();
-golferImage.src='Texture0.png';
+golferImage.src='Texture0.png'; //texture ripped from the wii game. contains body parts that are assembled to make the sprites.
 const golfercanv=document.getElementById('golfercanv'); //remove?
 const gctx=golfercanv.getContext('2d');
 
@@ -46,7 +46,7 @@ monkeyImage.src='Texture2.png';
 const monkeycanv=document.getElementById('monkeycanv');
 const mctx=monkeycanv.getContext('2d');
 
-var cancellationID;
+var cancellationID; //used to cancel the requestAnimationFrame() loop.
 var PauseTime=0;
 
 var curAnimObject={
@@ -55,17 +55,23 @@ var curAnimObject={
 	Mandrill:'b'
 	//animations with only one step don't cause errors any more.
 }
-var cursObject={
+var cursObject={ //stores the current sprite index for each character.
 	Golfer:0,
 	Monkey:0,
 	Mandrill:0
 }
-var prevCursObject={
+var prevCursObject={ //stores the previous sprite index. If the current sprite is the same as the previous one, it won't be redrawn (optimization)
 	Golfer:0,
 	Monkey:0,
 	Mandrill:0
 }
-var AnimIndexObject={
+var AnimIndexObject={ /*stores where in the animation the character currently is.
+this is different from the current sprite.
+How the animations work:
+Separate body parts are in Texture0.png
+These body parts are assembled to make separate poses, or sprites. 
+at this point, it becomes like a spritesheet ( https://github.com/Thysbelon/rhythm-heaven-web/blob/main/golfspritesheet.png )
+The sprites are then used for animations. An animation may reuse the same sprite multiple times in its runtime (the monkey spinning animation)*/
 	Golfer:0,
 	Monkey:0,
 	Mandrill:0
@@ -81,7 +87,14 @@ const AnimationList={
 	Golfer:{	
 		//GolfSwing:[22, 0.04*curbpmBeatTime, 24, 0.08*curbpmBeatTime, 25, 0.16*curbpmBeatTime...
 		//will this work?
-		
+		/*every group of six numbers is a different value. They are all settings to apply to that step of the animation. 
+		They are 
+		the index of the sprite to use, 
+		how much the sprite should be stretched or squished horizontally (-1 is a flip), 
+		same as previous but vertical, 
+		how much the sprite should be rotated, 
+		opacity, 
+		and when the step should end */
 		Ready:[4,1,1,0,255,0.08,5,1,1,0,255,0.16,6,1,1,0,255,0.24,7,1,1,0,255,0.36,8,1,1,0,255,0.48,9,1,1,0,255,0.6,10,1,1,0,255,0.72,11,1,1,0,255,1.08],
 		Beat:[3,1,1,0,255,0.16,2,1,1,0,255,0.32,1,1,1,0,255,0.8],
 		SwingHit:[19,1,1,0,255,0.04,21,1,1,0,255,0.08,22,1,1,0,255,0.16,23,1,1,0,255,0.24,23,1,1,0,255,0.32,24,1,1,0,255,0.4,24,1,1,0,255,0.48,25,1,1,0,255,0.6,26,1,1,0,255,0.76,27,1,1,0,255,1.96,1,1,1,0,255,2],
@@ -129,7 +142,15 @@ const AnimStartTimesy={
 	Mandrill:0
 }
 
-function UpdateSprite(curs, ctx, BRCAD, xImage){
+function UpdateSprite(curs, ctx, BRCAD, xImage){ //makes heavy use of the Canvas API
+/*each sprite is built by assembling the body parts from the Texture. 
+curs is the sprite being drawn. i is the current body part of the sprite being drawn.
+Each body part has settings for which region of the image it should be cut from (x:[0], y:[1], width:[2], height[3]), 
+where it should be placed (x:[4], y:[5]), how much it should be stretched (x:[6], y:[7]), 
+if it should or should not be flipped on the x or y axis (x:[8], y:[9]), 
+how much it should be rotated [10], and opacity [11] (opacity not used in function).
+These settings were extracted from the wii game using https://github.com/rhmodding/bread then converted to a javascript object. 
+the script tags at the top of this html file link to them. */
 	ctx.clearRect(0,0,1024,1024)
 	for (let i=0, l=BRCAD[curs].length, curX=0, curY=0; i < l; i++) {
 		
@@ -158,7 +179,6 @@ function UpdateSprite(curs, ctx, BRCAD, xImage){
 
 function UpdateAnim(time){
 	cancellationID=window.requestAnimationFrame(UpdateAnim)
-
 	if (time>=AnimationList.Golfer[curAnimObject.Golfer][AnimIndexObject.Golfer+5]*curbpmBeatTime+AnimStartTimesy.Golfer && AnimIndexObject.Golfer<=curAnimLengths.Golfer){
 		AnimIndexObject.Golfer+=6
 		cursObject.Golfer=AnimationList.Golfer[curAnimObject.Golfer][AnimIndexObject.Golfer]
@@ -175,12 +195,13 @@ function UpdateAnim(time){
 	if (cursObject.Monkey!==prevCursObject.Monkey) { //should this if statement be merged with the above if, and prevCursObject be removed?
 		//apply animations scale settings with a css transform
 		//monkeycanv.style.transform='scale('+AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+1]+','+AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+2]+')'
-		let temp=0;
+		let temp=0; //stores the sined rotation
 		if (AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+3]!==0) { //rotation
 		temp=Math.sin(AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+3])
 		//degrees could be sined on bread converstion
 		//same goes for the other values that are being converted here
 		}
+		//transform applies both scaling and rotation
 		monkeycanv.style.transform='matrix('+AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+1]+','+temp+','+-(temp)+','+AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+2]+',0,0)'
 		monkeycanv.style.opacity=AnimationList.Monkey[curAnimObject.Monkey][AnimIndexObject.Monkey+4]/255
 		UpdateSprite(cursObject.Monkey, mctx, MonkeySprites, monkeyImage)
